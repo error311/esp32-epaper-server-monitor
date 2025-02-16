@@ -17,6 +17,7 @@
 // Replace with your network credentials
 const char *ssid = "ssid";
 const char *password = "password";
+const char *MyHostName = "ESP32ServerMonitor";
 
 // Define NTP Client to get time
 WiFiUDP ntpUDP;
@@ -78,6 +79,7 @@ void setup() {
 
 
 void wifiInit() {  //init wifi
+  WiFi.setHostname(MyHostName);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   delay(500);
