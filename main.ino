@@ -11,8 +11,8 @@
 
 // deep sleep
 #define uS_TO_S_FACTOR 1000000    /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP 1800        // sleep 30 minutes
-#define TIME_TO_SLEEP_NoWIFI 120  // sleep only 2 minutes if no wifi
+#define TIME_TO_SLEEP 1785        // sleep 30 minutes
+#define TIME_TO_SLEEP_NoWIFI 30  // sleep only 2 minutes if no wifi
 
 // Replace with your network credentials
 const char *ssid = "ssid";
