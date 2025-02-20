@@ -3,19 +3,16 @@
 #include "EPD.h"
 #include "GUI_Paint.h"
 #include <stdlib.h>
-
 #include <WiFi.h>
 #include <ESP32Ping.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
-
 #include <HTTPClient.h>
 #include <Update.h>
-
 #include <ArduinoJson.h>
 
 #define FIRMWARE_URL1  "http://192.168.2.33/firmware_metadata.json"  // URL to JSON metadata file
-String current_version = "1.6";
+String current_version = "1.7";
 
 // deep sleep
 #define uS_TO_S_FACTOR 1000000    /* Conversion factor for micro seconds to seconds */
@@ -131,9 +128,8 @@ void drawNoConnection() { //draw no connection
   Paint_Clear(WHITE);
   Paint_DrawRectangle(7, 17, 290, 113, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
   //battery percentage readout
-  float batteryLevel = map(analogRead(33), 0.0f, 4095.0f, 0, 100);
-  int splitDecm = String(batteryLevel).indexOf(".");
-  String batLevel = String(batteryLevel).substring(0, splitDecm) + "%";
+  int batteryLevel = map(analogRead(33), 3412, 4095, 0, 100);
+  String batLevel = String(batteryLevel) + "%";
   //draw empty battery battery icon
   Paint_DrawRectangle(7, 117, 25, 125, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
   Paint_DrawRectangle(25, 120, 27, 123, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
@@ -250,9 +246,8 @@ void drawMainServerStatus() {  //draw strings or shapes
   Paint_DrawString_EN(159, 115, dateTime.c_str(), &Font12, BLACK, WHITE);
 
   //battery percentage readout
-  float batteryLevel = map(analogRead(33), 0.0f, 4095.0f, 0, 100);
-  int splitDecm = String(batteryLevel).indexOf(".");
-  String batLevel = String(batteryLevel).substring(0, splitDecm) + "%";
+  int batteryLevel = map(analogRead(33), 3412, 4095, 0, 100);
+  String batLevel = String(batteryLevel) + "%";
 
   //draw empty battery battery icon
   Paint_DrawRectangle(7, 117, 25, 125, BLACK, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
