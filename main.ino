@@ -9,6 +9,14 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
+#include <HTTPClient.h>
+#include <Update.h>
+
+#include <ArduinoJson.h>
+
+#define FIRMWARE_URL1  "http://192.168.2.33/firmware_metadata.json"  // URL to JSON metadata file
+String current_version = "1.6";
+
 // deep sleep
 #define uS_TO_S_FACTOR 1000000    /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP 1785        // sleep 30 minutes
@@ -18,6 +26,9 @@
 const char *ssid = "ssid";
 const char *password = "password";
 const char *MyHostName = "ESP32ServerMonitor";
+
+String firmware_url = "";
+String firmware_version = "";
 
 // Define NTP Client to get time
 WiFiUDP ntpUDP;
@@ -56,6 +67,8 @@ bool pingMedia, pingFire, pingUnraid, pingVPN, pingVM, pingRequest;
 void setup() {
   //Serial.begin(115200);
   wifiInit();
+  delay(5000);
+  checkForFirmwareUpdate();
   analogRead(33);  //esp32 pin 33 battery voltage stepped down from 4.2v to 3.2v
   ePaperInit();
 
@@ -363,6 +376,91 @@ void pingServers() {  //ping the servers once multiple times if failed to speed 
       pingVM = Ping.ping(vmHost, 2);
     }
   }
+}
+
+void checkForFirmwareUpdate() {
+  HTTPClient http;
+  http.begin(FIRMWARE_URL1);
+  // Make an HTTP request to get the firmware metadata JSON
+  int httpCode = http.GET();
+  if (httpCode == 200) {
+    String payload = http.getString();
+    Serial.println("Metadata JSON received:");
+
+    // Parse JSON
+    DynamicJsonDocument doc(1024);
+    deserializeJson(doc, payload);
+    firmware_version = doc["version"].as<String>();
+    firmware_url = doc["url"].as<String>();
+
+    Serial.println("Firmware Version: " + firmware_version);
+    Serial.println("Firmware URL: " + firmware_url);
+
+    // Check if the firmware version is newer than the current one
+    if (isNewVersionAvailable(firmware_version)) {
+      Serial.println("New firmware available. Starting update...");
+
+      // Start the firmware update process
+      performOTAUpdate(firmware_url);
+    } else {
+      Serial.println("No new firmware available.");
+    }
+  } else {
+    Serial.println("Failed to fetch metadata from server. HTTP Code: " + String(httpCode));
+  }
+
+  http.end();
+}
+
+bool isNewVersionAvailable(const String &new_version) {
+  // Compare the current firmware version with the new version
+  // You can replace this with a more complex version comparison logic if needed
+    // Get the current firmware version (you can use other methods)
+  
+  return (new_version != current_version);
+}
+
+void performOTAUpdate(const String &url) {
+  WiFiClient client;
+  HTTPClient http;
+  http.begin(client, url);
+  
+  // Get firmware file
+  int httpCode = http.GET();
+  if (httpCode == 200) {
+    int contentLength = http.getSize();
+    if (contentLength <= 0) {
+      Serial.println("Invalid content length.");
+      return;
+    }
+
+    // Create a stream to write the firmware
+    WiFiClient *stream = http.getStreamPtr();
+
+    Serial.println("Starting OTA update...");
+
+    if (Update.begin(contentLength)) {
+      size_t written = Update.writeStream(*stream);
+      if (written == contentLength) {
+        Serial.println("Written: " + String(written) + " successfully.");
+      } else {
+        Serial.println("Write failed.");
+      }
+
+      if (Update.end()) {
+        Serial.println("OTA update completed. Rebooting...");
+        ESP.restart();
+      } else {
+        Serial.println("Error during update: " + String(Update.getError()));
+      }
+    } else {
+      Serial.println("Not enough space for OTA.");
+    }
+  } else {
+    Serial.println("Firmware download failed. HTTP Code: " + String(httpCode));
+  }
+
+  http.end();
 }
 
 /* The main loop -------------------------------------------------------------*/
