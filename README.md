@@ -1,5 +1,7 @@
 Waveshare 2.9 inch three color display with esp32 dev board
 
+![IMG_GIF](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExN25ndTh1M210cDQ2YmoyZ2JxMHhvaDhuY2ZwdWhrMG5laWUxbDhndCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PhyvYUAnRazYXIRS7p/giphy.gif)
+
 ![IMG_0170](https://github.com/user-attachments/assets/b26c5a05-40ca-4e22-ae49-3e4b6dbc1e4b)
 ![IMG_0169](https://github.com/user-attachments/assets/90856e2f-6d15-4176-890a-cc58fb3aa808)
 
