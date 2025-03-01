@@ -27,4 +27,5 @@ ArduinoJson library
 
 3d Print back frame housing modified to fit .stl added
 
+
 reddit link: https://www.reddit.com/r/esp32/comments/1inhw85/esp32_epaper_server_monitor/
